@@ -35,12 +35,13 @@ ENV ETESYNC_DATABASE_FILE "db.sqlite3"
 ENV ETESYNC_PORT ${PORT}
 
 # Install uWSGI.
-# Unfortunately this needs a compiler, so we install one for just this step.
+# Unfortunately this needs a compiler, so we install one for just this step. We also install
+# libpcre3 to enable internal routing in uWSGI.
 RUN apt-get update \
- && apt-get install -y build-essential python3-dev \
+ && apt-get install -y build-essential python3-dev libpcre3-dev \
  && pip3 install uwsgi \
  && pip3 cache purge \
- && apt-get purge -y --auto-remove build-essential python3-dev \
+ && apt-get purge -y --auto-remove build-essential python3-dev libpcre3-dev \
  && rm -rf /var/lib/apt/lists/*
 
 # Download EteSync.
