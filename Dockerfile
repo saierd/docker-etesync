@@ -1,5 +1,5 @@
-ARG ETESYNC_TAG=legacy
-ARG ETESYNC_WEB_TAG=legacy
+ARG ETEBASE_TAG=master
+ARG ETESYNC_WEB_TAG=master
 
 ARG PUID=1000
 ARG PGID=1000
@@ -24,15 +24,16 @@ RUN mkdir -p etesync-web \
 
 FROM python:3.8-slim
 
-ARG ETESYNC_TAG
+ARG ETEBASE_TAG
 ARG PUID
 ARG PGID
 ARG PORT
 
-ENV ETESYNC_DIRECTORY "/opt/etesync"
-ENV ETESYNC_DATA_DIRECTORY "/data"
-ENV ETESYNC_DATABASE_FILE "db.sqlite3"
-ENV ETESYNC_PORT ${PORT}
+ENV ETEBASE_DIRECTORY "/opt/etebase"
+ENV ETEBASE_DATA_DIRECTORY "/data"
+ENV ETEBASE_MEDIA_DIRECTORY "/data/media"
+ENV ETEBASE_DATABASE_FILE "db.sqlite3"
+ENV ETEBASE_PORT ${PORT}
 
 # Install uWSGI.
 # Unfortunately this needs a compiler, so we install one for just this step. We also install
@@ -44,28 +45,28 @@ RUN apt-get update \
  && apt-get purge -y --auto-remove build-essential python3-dev libpcre3-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Download EteSync.
-ADD https://github.com/etesync/server/archive/${ETESYNC_TAG}.tar.gz etesync.tar.gz
-RUN mkdir -p ${ETESYNC_DIRECTORY} \
- && tar xf etesync.tar.gz --strip-components=1 --exclude="example-configs" -C ${ETESYNC_DIRECTORY} \
- && rm etesync.tar.gz \
- && pip3 install --no-cache-dir -r ${ETESYNC_DIRECTORY}/requirements.txt \
- && ${ETESYNC_DIRECTORY}/manage.py collectstatic
+# Download Etebase.
+ADD https://github.com/etesync/server/archive/${ETEBASE_TAG}.tar.gz etebase.tar.gz
+RUN mkdir -p ${ETEBASE_DIRECTORY} \
+ && tar xf etebase.tar.gz --strip-components=1 --exclude="example-configs" -C ${ETEBASE_DIRECTORY} \
+ && rm etebase.tar.gz \
+ && pip3 install --no-cache-dir -r ${ETEBASE_DIRECTORY}/requirements.txt \
+ && ${ETEBASE_DIRECTORY}/manage.py collectstatic
 
 # Copy the web client from the other build stage.
-COPY --from=web /etesync-web/build ${ETESYNC_DIRECTORY}/web
+COPY --from=web /etesync-web/build ${ETEBASE_DIRECTORY}/web
 
 # Create a user as which the server will run.
-RUN groupadd --gid ${PGID} etesync \
- && useradd --uid ${PUID} --gid etesync --shell /bin/bash etesync
+RUN groupadd --gid ${PGID} etebase \
+ && useradd --uid ${PUID} --gid etebase --shell /bin/bash etebase
 
 # Copy configuration files and startup script.
-COPY config/etesync_site_settings.py ${ETESYNC_DIRECTORY}/etesync_site_settings.py
+COPY config/etebase_server_settings.py ${ETEBASE_DIRECTORY}/etebase_server_settings.py
 COPY config/uwsgi.ini /etc/uwsgi/
 COPY scripts/init.sh /
 
-VOLUME ${ETESYNC_DATA_DIRECTORY}
-EXPOSE ${ETESYNC_PORT}
+VOLUME ${ETEBASE_DATA_DIRECTORY}
+EXPOSE ${ETEBASE_PORT}
 USER ${PUID}:${PGID}
 
 CMD ["/init.sh"]

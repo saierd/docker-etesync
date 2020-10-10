@@ -3,19 +3,19 @@
 set -e
 
 run_migrations() {
-    ${ETESYNC_DIRECTORY}/manage.py migrate
+    ${ETEBASE_DIRECTORY}/manage.py migrate
 }
 
 create_admin_user() {
     username="admin"
 
-    password="${ETESYNC_INITIAL_ADMIN_PASSWORD}"
+    password="${ETEBASE_INITIAL_ADMIN_PASSWORD}"
     if [ -z "${password}" ]; then
         password=$(openssl rand -base64 21)
         password_generated=true
     fi
 
-    echo "from django.contrib.auth.models import User; User.objects.create_superuser('${username}', '', '${password}')" | ${ETESYNC_DIRECTORY}/manage.py shell
+    echo "from myauth.models import User; User.objects.create_superuser('${username}', '', '${password}')" | ${ETEBASE_DIRECTORY}/manage.py shell
 
     echo ""
     printf "%76s\n" | tr " " "#"
@@ -27,13 +27,13 @@ create_admin_user() {
         printf "## %-70s ##\n" "  Password: Specified through an environment variable"
     fi
     printf "## %-70s ##\n" ""
-    printf "## %-70s ##\n" "Open http://localhost:${ETESYNC_PORT}/admin (or the location where you mapped"
+    printf "## %-70s ##\n" "Open http://localhost:${ETEBASE_PORT}/admin (or the location where you mapped"
     printf "## %-70s ##\n" "the HTTP port) to manage users."
     printf "%76s\n" | tr " " "#"
     echo ""
 }
 
-if [ ! -f "${ETESYNC_DATA_DIRECTORY}/${ETESYNC_DATABASE_FILE}" ]; then
+if [ ! -f "${ETEBASE_DATA_DIRECTORY}/${ETEBASE_DATABASE_FILE}" ]; then
     run_migrations
     create_admin_user
 else
@@ -41,5 +41,5 @@ else
 fi
 
 # Run the server.
-echo "Running server on port ${ETESYNC_PORT}..."
+echo "Running server on port ${ETEBASE_PORT}..."
 uwsgi /etc/uwsgi/uwsgi.ini > /dev/null
