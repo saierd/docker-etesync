@@ -49,8 +49,7 @@ ADD https://github.com/etesync/server/archive/${ETESYNC_TAG}.tar.gz etesync.tar.
 RUN mkdir -p ${ETESYNC_DIRECTORY} \
  && tar xf etesync.tar.gz --strip-components=1 --exclude="example-configs" -C ${ETESYNC_DIRECTORY} \
  && rm etesync.tar.gz \
- && pip3 install -r ${ETESYNC_DIRECTORY}/requirements.txt \
- && pip3 cache purge \
+ && pip3 install --no-cache-dir -r ${ETESYNC_DIRECTORY}/requirements.txt \
  && ${ETESYNC_DIRECTORY}/manage.py collectstatic
 
 # Copy the web client from the other build stage.
