@@ -8,7 +8,7 @@ Start a Docker container with
 docker run -v <PATH TO DATA DIRECTORY>:/data -p 8080:8080 dsaier/etesync
 ```
 
-This automatically creates a SQLite database in the given data directory if it does not exist yet. It also creates a user `admin` and prints its random password in the container output.
+This automatically creates a SQLite database in the given data directory if it does not exist yet. It also creates a user `admin` and prints its random password in the container output. Alternatively you can specify the initial password of the `admin` user with the environment variable `ETESYNC_INITIAL_ADMIN_PASSWORD`.
 
 Go to `localhost:8080/admin` and login with this `admin` user to change its password and create normal users. Then go to `localhost:8080` to use the web client.
 
