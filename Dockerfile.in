@@ -1,5 +1,5 @@
-ARG ETEBASE_TAG=057b908565072bf9b1003410c0080f42294d446a
-ARG ETESYNC_WEB_TAG=c0d884afd7499d3174b405bb10a2629eec376ecc
+ARG `ETEBASE_TAG'=ETEBASE_TAG
+ARG `ETESYNC_WEB_TAG'=ETESYNC_WEB_TAG
 
 ARG PUID=1000
 ARG PGID=1000
@@ -10,9 +10,9 @@ ARG PORT=8080
 
 FROM node:12 as web
 
-ARG ETESYNC_WEB_TAG
+ARG `ETESYNC_WEB_TAG'
 
-ADD https://github.com/etesync/etesync-web/archive/${ETESYNC_WEB_TAG}.tar.gz etesync_web.tar.gz
+ADD https://github.com/etesync/etesync-web/archive/${`ETESYNC_WEB_TAG'}.tar.gz etesync_web.tar.gz
 ENV REACT_APP_DEFAULT_API_PATH "/"
 RUN mkdir -p etesync-web \
  && tar xf etesync_web.tar.gz --strip-components=1 -C etesync-web \
@@ -24,7 +24,7 @@ RUN mkdir -p etesync-web \
 
 FROM python:3.8-slim
 
-ARG ETEBASE_TAG
+ARG `ETEBASE_TAG'
 ARG PUID
 ARG PGID
 ARG PORT
@@ -46,7 +46,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # Download Etebase.
-ADD https://github.com/etesync/server/archive/${ETEBASE_TAG}.tar.gz etebase.tar.gz
+ADD https://github.com/etesync/server/archive/${`ETEBASE_TAG'}.tar.gz etebase.tar.gz
 RUN mkdir -p ${ETEBASE_DIRECTORY} \
  && tar xf etebase.tar.gz --strip-components=1 --exclude="example-configs" -C ${ETEBASE_DIRECTORY} \
  && rm etebase.tar.gz \
